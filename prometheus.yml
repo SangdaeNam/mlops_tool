@@ -1,0 +1,10 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['172.31.10.60:9090']
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['172.31.9.2:9100', '172.31.31.223:9100']
