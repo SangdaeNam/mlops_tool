@@ -1,36 +1,37 @@
-export http_proxy=http://proxy-dmz.intel.com:912
-export https_proxy=http://proxy-dmz.intel.com:912
-export no_proxy="127.0.0.1,localhost,intel.com"
 #Setting Prometheus
+root=$(pwd)
 sudo mkdir -p /data/docker/prometheus/
 sudo cp prometheus.yml /data/docker/prometheus/prometheus.yml
 
 mkdir prometheus
 cd prometheus
 
-# sudo useradd -M -r -s /bin/false grafana
+sudo useradd -M -r -s /bin/false grafana
 docker volume create --name=prometheus_data
 docker volume create --name=grafana_data
 docker volume ls
 
 sudo useradd -M -r -s /bin/false grafana
 
-docker-compose up -d
-
 sudo ufw allow 3000/tcp
 sudo ufw allow 9090/tcp
+sudo ufw allow 9100/tcp
 
-curl http://admin:admin@localhost:3000/api/datasources --header 'Content-Type: application/json' --data @/home/sangdaen/workspace/mlops_tool/local-datasource.json
+docker-compose up -d
 
-sudo apt-get insatll jq
-curl https://grafana.com/api/dashboards/1860 | jq '.json' > /home/sangdaen/workspace/mlops_tool/dashboard-1860.json
+curl http://admin:admin@localhost:3000/api/datasources --header 'Content-Type: application/json' --data @"$root/local-datasource.json"
+
+sudo apt-get install jq
+
+dash_num=1860
+curl https://grafana.com/api/dashboards/$dash_num | jq '.json' > "$root/dashboard-$dash_num.json"
 
 ( echo '{ "overwrite": true, "dashboard" :'; \
-    cat /home/sangdaen/workspace/mlops_tool/dashboard-1860.json; \
+    cat "$root/dashboard-$dash_num.json"; \
     echo '}' ) \
     | jq \
-    > /home/sangdaen/workspace/mlops_tool/dashboard-1860-modified.json
+    > "$root/dashboard-$dash_num-modified.json"
 
 curl http://admin:admin@localhost:3000/api/dashboards/db \
     --header 'Content-Type: application/json' \
-    --data @/home/sangdaen/workspace/mlops_tool/dashboard-1860-modified.json
+    --data @"$root/dashboard-$dash_num-modified.json"
