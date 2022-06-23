@@ -5,7 +5,7 @@ export no_proxy="127.0.0.1,localhost,intel.com"
 
 curl -LO https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
 tar -xvf node_exporter-1.0.1.linux-amd64.tar.gz
-echo intel@123 | sudo -S command
+echo ${sudo-password} | sudo -S command
 
 sudo mv node_exporter-1.0.1.linux-amd64/node_exporter /usr/local/bin/
 
